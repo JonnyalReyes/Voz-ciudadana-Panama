@@ -22,7 +22,7 @@ export default function RegistroPage() {
       />
 
       <section className="py-8 md:py-12 bg-white">
-        <div className="container px-4 md:px-6 max-w-md">
+        <div className="container mx-auto px-4 md:px-6 max-w-md">
           <Tabs defaultValue="registro" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="registro">Registro</TabsTrigger>
