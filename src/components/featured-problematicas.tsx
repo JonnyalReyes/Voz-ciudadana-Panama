@@ -5,37 +5,17 @@ import Link from "next/link"
 import { Users, MessageSquare, ArrowRight } from "lucide-react"
 
 export default function FeaturedProblematicas() {
-  // Datos de ejemplo para problemáticas destacadas
+  // Solo la problemática de la CSS como ejemplo
   const problematicas = [
     {
       id: "1",
-      title: "Mejora del Sistema Educativo Panameño",
+      title: "Reforma de la Caja del Seguro Social - Ley 462",
       description:
-        "Análisis de los desafíos actuales y propuestas para fortalecer la calidad educativa en todos los niveles.",
-      category: "Educación",
+        "Análisis de la controvertida Ley 462 y sus implicaciones para los trabajadores y pensionados panameños.",
+      category: "Seguridad Social",
       phase: "Recolección de opiniones",
-      participants: 1245,
-      comments: 324,
-    },
-    {
-      id: "2",
-      title: "Acceso al Agua Potable en Zonas Rurales",
-      description:
-        "Evaluación de la situación actual y estrategias para garantizar el acceso equitativo al agua potable en todo el territorio nacional.",
-      category: "Infraestructura",
-      phase: "En discusión",
-      participants: 876,
-      comments: 215,
-    },
-    {
-      id: "3",
-      title: "Transparencia en la Gestión Pública",
-      description:
-        "Mecanismos para fortalecer la rendición de cuentas y prevenir la corrupción en las instituciones públicas.",
-      category: "Transparencia",
-      phase: "Fase de información",
-      participants: 543,
-      comments: 98,
+      participants: 2847,
+      comments: 456,
     },
   ]
 
@@ -72,6 +52,16 @@ export default function FeaturedProblematicas() {
           </CardFooter>
         </Card>
       ))}
+
+      {/* Placeholder para futuras problemáticas */}
+      <Card className="flex flex-col h-full border-dashed border-2 border-gray-300">
+        <CardContent className="flex-grow flex items-center justify-center p-6">
+          <div className="text-center">
+            <p className="text-gray-500 mb-2">Próximamente</p>
+            <p className="text-sm text-gray-400">Nuevas problemáticas serán agregadas por los administradores</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -15,11 +15,12 @@ import {
 } from "../components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "../components/ui/sheet"
 import { ThemeToggle } from "../components/theme-toggle"
-import { Search, Menu, Bell, User, LogOut, Settings } from "lucide-react"
+import { Search, Menu, Bell, User, LogOut, Settings, Shield } from "lucide-react"
 import { usePathname } from "next/navigation"
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false) // Simulación de estado de autenticación
+  const [isAdmin, setIsAdmin] = useState(true) // Simulación de rol de administrador
   const pathname = usePathname()
 
   const isActive = (path: string) => {
@@ -29,9 +30,9 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-6 md:gap-8 lg:gap-10">
+        <div className="flex items-center gap-6 md:gap-10 lg:gap-10">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold">Voz Ciudadana Panamá</span>
+            <span className="text-xl font-bold">Habla Panamá</span>
           </Link>
 
           <nav className="hidden md:flex gap-6">
@@ -53,6 +54,15 @@ export default function Header() {
             >
               Resultados
             </Link>
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/admin") ? "text-primary" : "text-foreground/60"} flex items-center gap-1`}
+              >
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
           </nav>
         </div>
 
@@ -96,6 +106,14 @@ export default function Header() {
                       <span>Notificaciones</span>
                     </Link>
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin" className="cursor-pointer flex items-center gap-2">
+                        <Shield className="h-4 w-4" />
+                        <span>Administración</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link href="/perfil?tab=configuracion" className="cursor-pointer flex items-center gap-2">
                       <Settings className="h-4 w-4" />
@@ -116,7 +134,7 @@ export default function Header() {
                 <Link href="/registro?tab=iniciar-sesion">Iniciar sesión</Link>
               </Button>
               <Button asChild>
-                <Link href="/registro">Registrarse</Link>
+                <Link href="/registro">Solicitar Registro</Link>
               </Button>
             </div>
           )}
@@ -132,7 +150,7 @@ export default function Header() {
               <div className="grid gap-6 py-6">
                 <div className="flex items-center justify-between">
                   <Link href="/" className="flex items-center space-x-2">
-                    <span className="font-bold">Voz Ciudadana Panamá</span>
+                    <span className="font-bold">Habla Panamá</span>
                   </Link>
                   <ThemeToggle />
                 </div>
@@ -161,6 +179,15 @@ export default function Header() {
                   >
                     Resultados
                   </Link>
+                  {isAdmin && (
+                    <Link
+                      href="/admin"
+                      className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/admin") ? "text-primary" : "text-foreground/60"} flex items-center gap-2`}
+                    >
+                      <Shield className="h-4 w-4" />
+                      Administración
+                    </Link>
+                  )}
                 </nav>
 
                 {isLoggedIn ? (
@@ -177,7 +204,7 @@ export default function Header() {
                 ) : (
                   <div className="grid gap-2">
                     <Button asChild>
-                      <Link href="/registro">Registrarse</Link>
+                      <Link href="/registro">Solicitar verificación</Link>
                     </Button>
                     <Button variant="outline" asChild>
                       <Link href="/registro?tab=iniciar-sesion">Iniciar sesión</Link>

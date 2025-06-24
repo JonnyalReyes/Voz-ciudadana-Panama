@@ -1,5 +1,5 @@
 import { Card, CardContent } from "../components/ui/card"
-import { Users, FileText, MessageSquare, CheckCircle } from "lucide-react"
+import { Users, FileText, MessageSquare, TrendingUp } from "lucide-react"
 
 export default function ParticipationStats() {
   return (
@@ -7,32 +7,32 @@ export default function ParticipationStats() {
       <Card>
         <CardContent className="p-6 flex flex-col items-center text-center">
           <Users className="h-12 w-12 mb-4 text-primary" />
-          <h3 className="text-3xl font-bold">50,000+</h3>
-          <p className="text-gray-500">Ciudadanos registrados</p>
+          <h3 className="text-3xl font-bold">1,250+</h3>
+          <p className="text-gray-500">Ciudadanos verificados</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardContent className="p-6 flex flex-col items-center text-center">
           <FileText className="h-12 w-12 mb-4 text-primary" />
-          <h3 className="text-3xl font-bold">25+</h3>
-          <p className="text-gray-500">Problemáticas abordadas</p>
+          <h3 className="text-3xl font-bold">2,847</h3>
+          <p className="text-gray-500">Opiniones registradas</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardContent className="p-6 flex flex-col items-center text-center">
           <MessageSquare className="h-12 w-12 mb-4 text-primary" />
-          <h3 className="text-3xl font-bold">28,000+</h3>
-          <p className="text-gray-500">Propuestas recibidas</p>
+          <h3 className="text-3xl font-bold">456</h3>
+          <p className="text-gray-500">Propuestas ciudadanas</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardContent className="p-6 flex flex-col items-center text-center">
-          <CheckCircle className="h-12 w-12 mb-4 text-primary" />
-          <h3 className="text-3xl font-bold">12</h3>
-          <p className="text-gray-500">Soluciones implementadas</p>
+          <TrendingUp className="h-12 w-12 mb-4 text-primary" />
+          <h3 className="text-3xl font-bold">95%</h3>
+          <p className="text-gray-500">Satisfacción del proceso</p>
         </CardContent>
       </Card>
     </div>

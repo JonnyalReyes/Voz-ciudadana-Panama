@@ -5,13 +5,11 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "../components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card"
-import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 import { Textarea } from "../components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group"
 import { Checkbox } from "../components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { AlertCircle, Save, Send } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert"
 
@@ -40,295 +38,288 @@ export default function OpinionForm() {
       {isSuccess && (
         <Alert className="bg-green-50 border-green-200">
           <AlertCircle className="h-4 w-4 text-green-600" />
-          <AlertTitle className="text-green-600">Enviado correctamente</AlertTitle>
+          <AlertTitle className="text-green-600">Opinión registrada exitosamente</AlertTitle>
           <AlertDescription className="text-green-600">
-            Tu opinión ha sido registrada. ¡Gracias por contribuir a la búsqueda de soluciones!
+            Gracias por compartir tu voz. Tu opinión contribuye al diálogo ciudadano sobre la Ley 462.
           </AlertDescription>
         </Alert>
       )}
 
       <div className="bg-primary/5 p-4 rounded-lg">
         <p className="text-sm">
-          <span className="font-medium">Nota importante:</span> Tus opiniones y propuestas serán analizadas y podrían
-          ser incluidas en el informe final de resultados de forma anónima. Toda la información personal se maneja de
-          acuerdo con la Ley 81 de Protección de Datos Personales.
+          <span className="font-medium">Tu voz importa:</span> Comparte tu experiencia y opinión sobre la Ley 462. Todas
+          las respuestas son anónimas y serán incluidas en nuestros informes ciudadanos.
         </p>
       </div>
 
-      <Tabs defaultValue="opinion" className="w-full">
-        <TabsList className="w-full max-w-md mx-auto">
-          <TabsTrigger value="opinion">Opinión general</TabsTrigger>
-          <TabsTrigger value="propuesta">Propuesta detallada</TabsTrigger>
-        </TabsList>
+      <form onSubmit={handleSubmit}>
+        <Card>
+          <CardHeader>
+            <CardTitle>Tu opinión sobre la Ley 462 y la CSS</CardTitle>
+            <CardDescription>
+              Ayúdanos a documentar el impacto real de la Ley 462 en la vida de los panameños.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Tu relación con la CSS</h3>
+              <div className="space-y-3">
+                <Label>¿Cuál es tu relación con la Caja del Seguro Social?</Label>
+                <RadioGroup defaultValue="">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="asegurado-activo" id="asegurado-activo" />
+                    <Label htmlFor="asegurado-activo">Asegurado activo (trabajador cotizante)</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="pensionado" id="pensionado" />
+                    <Label htmlFor="pensionado">Pensionado/Jubilado</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="beneficiario" id="beneficiario" />
+                    <Label htmlFor="beneficiario">Beneficiario (familiar de asegurado)</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="empleador" id="empleador" />
+                    <Label htmlFor="empleador">Empleador</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="otro" id="otro" />
+                    <Label htmlFor="otro">Otro</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
 
-        <TabsContent value="opinion" className="mt-6">
-          <form onSubmit={handleSubmit}>
-            <Card>
-              <CardHeader>
-                <CardTitle>Tu opinión sobre el sistema educativo panameño</CardTitle>
-                <CardDescription>
-                  Comparte tu percepción general sobre la problemática y los factores que consideras más relevantes.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Percepción general</h3>
-                  <div className="space-y-3">
-                    <Label>¿Cómo evalúas la calidad actual del sistema educativo panameño?</Label>
-                    <RadioGroup defaultValue="regular">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="muy-deficiente" id="muy-deficiente" />
-                        <Label htmlFor="muy-deficiente">Muy deficiente</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="deficiente" id="deficiente" />
-                        <Label htmlFor="deficiente">Deficiente</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="regular" id="regular" />
-                        <Label htmlFor="regular">Regular</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="bueno" id="bueno" />
-                        <Label htmlFor="bueno">Bueno</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="excelente" id="excelente" />
-                        <Label htmlFor="excelente">Excelente</Label>
-                      </div>
-                    </RadioGroup>
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Conocimiento sobre la Ley 462</h3>
+              <div className="space-y-3">
+                <Label>¿Qué tanto conoces sobre la Ley 462 y sus cambios?</Label>
+                <RadioGroup defaultValue="">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="mucho" id="conoce-mucho" />
+                    <Label htmlFor="conoce-mucho">Conozco mucho sobre la ley y sus implicaciones</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="algo" id="conoce-algo" />
+                    <Label htmlFor="conoce-algo">Conozco algunos aspectos generales</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="poco" id="conoce-poco" />
+                    <Label htmlFor="conoce-poco">Conozco muy poco</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="nada" id="conoce-nada" />
+                    <Label htmlFor="conoce-nada">No conozco sobre la ley</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Tu opinión sobre la aprobación de la Ley 462</h3>
+              <div className="space-y-3">
+                <Label>¿Qué opinas sobre la aprobación de la Ley 462?</Label>
+                <RadioGroup defaultValue="">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="muy-acuerdo" id="aprobacion-muy-acuerdo" />
+                    <Label htmlFor="aprobacion-muy-acuerdo">Estoy muy de acuerdo con la aprobación</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="acuerdo" id="aprobacion-acuerdo" />
+                    <Label htmlFor="aprobacion-acuerdo">Estoy de acuerdo</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="neutral" id="aprobacion-neutral" />
+                    <Label htmlFor="aprobacion-neutral">Me es indiferente</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="desacuerdo" id="aprobacion-desacuerdo" />
+                    <Label htmlFor="aprobacion-desacuerdo">Estoy en desacuerdo</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="muy-desacuerdo" id="aprobacion-muy-desacuerdo" />
+                    <Label htmlFor="aprobacion-muy-desacuerdo">Estoy muy en desacuerdo</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Impacto del aumento de cotizaciones</h3>
+              <div className="space-y-3">
+                <Label>¿Cómo te afecta el aumento de cotizaciones al 12.25%?</Label>
+                <RadioGroup defaultValue="">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="no-afecta" id="cotiz-no-afecta" />
+                    <Label htmlFor="cotiz-no-afecta">No me afecta significativamente</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="afecta-poco" id="cotiz-afecta-poco" />
+                    <Label htmlFor="cotiz-afecta-poco">Me afecta un poco</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="afecta-mucho" id="cotiz-afecta-mucho" />
+                    <Label htmlFor="cotiz-afecta-mucho">Me afecta mucho</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="afecta-gravemente" id="cotiz-afecta-gravemente" />
+                    <Label htmlFor="cotiz-afecta-gravemente">Me afecta gravemente</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="no-aplica" id="cotiz-no-aplica" />
+                    <Label htmlFor="cotiz-no-aplica">No me aplica</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Calidad de servicios de la CSS</h3>
+              <div className="space-y-3">
+                <Label>¿Cómo calificarías los servicios actuales de la CSS?</Label>
+                <RadioGroup defaultValue="">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="excelente" id="servicios-excelente" />
+                    <Label htmlFor="servicios-excelente">Excelente</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="buena" id="servicios-buena" />
+                    <Label htmlFor="servicios-buena">Buena</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="regular" id="servicios-regular" />
+                    <Label htmlFor="servicios-regular">Regular</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="mala" id="servicios-mala" />
+                    <Label htmlFor="servicios-mala">Mala</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="muy-mala" id="servicios-muy-mala" />
+                    <Label htmlFor="servicios-muy-mala">Muy mala</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Principales preocupaciones</h3>
+              <div className="space-y-3">
+                <Label>¿Cuáles son tus principales preocupaciones sobre la Ley 462? (Selecciona hasta 3)</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="aumento-cotizaciones" />
+                    <Label htmlFor="aumento-cotizaciones">Aumento de cotizaciones</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="edad-jubilacion" />
+                    <Label htmlFor="edad-jubilacion">Cambios en edad de jubilación</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="calidad-servicios" />
+                    <Label htmlFor="calidad-servicios">No mejora la calidad de servicios</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="falta-transparencia" />
+                    <Label htmlFor="falta-transparencia">Falta de transparencia</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="impacto-economico" />
+                    <Label htmlFor="impacto-economico">Impacto económico personal</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="desconfianza-gestion" />
+                    <Label htmlFor="desconfianza-gestion">Desconfianza en la gestión</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="proceso-aprobacion" />
+                    <Label htmlFor="proceso-aprobacion">Proceso de aprobación apresurado</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="falta-consulta" />
+                    <Label htmlFor="falta-consulta">Falta de consulta ciudadana</Label>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Factores críticos</h3>
-                  <div className="space-y-3">
-                    <Label>
-                      ¿Cuáles consideras que son los factores más críticos que afectan la calidad educativa? (Selecciona
-                      hasta 3)
-                    </Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="formacion-docente" />
-                        <Label htmlFor="formacion-docente">Formación y capacitación docente</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="infraestructura" />
-                        <Label htmlFor="infraestructura">Infraestructura y recursos educativos</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="curriculo" />
-                        <Label htmlFor="curriculo">Currículo desactualizado</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="tecnologia" />
-                        <Label htmlFor="tecnologia">Acceso a tecnología</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="gestion" />
-                        <Label htmlFor="gestion">Gestión y administración educativa</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="financiamiento" />
-                        <Label htmlFor="financiamiento">Financiamiento insuficiente</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="participacion-familia" />
-                        <Label htmlFor="participacion-familia">Participación de las familias</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="desigualdad" />
-                        <Label htmlFor="desigualdad">Desigualdad socioeconómica</Label>
-                      </div>
-                    </div>
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Confianza en la CSS</h3>
+              <div className="space-y-3">
+                <Label>¿Qué nivel de confianza tienes en la CSS después de la Ley 462?</Label>
+                <RadioGroup defaultValue="">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="mucha-confianza" id="mucha-confianza" />
+                    <Label htmlFor="mucha-confianza">Mucha confianza</Label>
                   </div>
-                </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="algo-confianza" id="algo-confianza" />
+                    <Label htmlFor="algo-confianza">Algo de confianza</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="poca-confianza" id="poca-confianza" />
+                    <Label htmlFor="poca-confianza">Poca confianza</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="ninguna-confianza" id="ninguna-confianza" />
+                    <Label htmlFor="ninguna-confianza">Ninguna confianza</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Prioridades</h3>
-                  <div className="space-y-3">
-                    <Label htmlFor="prioridad">
-                      ¿Qué área consideras que debería ser prioritaria para mejorar el sistema educativo?
-                    </Label>
-                    <Select>
-                      <SelectTrigger id="prioridad">
-                        <SelectValue placeholder="Selecciona una opción" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="formacion-docente">Formación y condiciones laborales docentes</SelectItem>
-                        <SelectItem value="infraestructura">Mejora de infraestructura escolar</SelectItem>
-                        <SelectItem value="tecnologia">Incorporación de tecnologías educativas</SelectItem>
-                        <SelectItem value="curriculo">Actualización curricular</SelectItem>
-                        <SelectItem value="evaluacion">Sistemas de evaluación y seguimiento</SelectItem>
-                        <SelectItem value="inclusion">Educación inclusiva y atención a la diversidad</SelectItem>
-                        <SelectItem value="gestion">Reforma de la gestión educativa</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Prioridad para mejorar la CSS</h3>
+              <div className="space-y-3">
+                <Label>¿Cuál debería ser la principal prioridad para mejorar la CSS?</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona una opción" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mejorar-servicios">Mejorar calidad de servicios de salud</SelectItem>
+                    <SelectItem value="transparencia">Aumentar transparencia y rendición de cuentas</SelectItem>
+                    <SelectItem value="modernizar-gestion">Modernizar gestión administrativa</SelectItem>
+                    <SelectItem value="infraestructura">Mejorar infraestructura hospitalaria</SelectItem>
+                    <SelectItem value="combatir-corrupcion">Combatir la corrupción</SelectItem>
+                    <SelectItem value="consulta-ciudadana">Realizar consulta ciudadana real</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Experiencia personal</h3>
-                  <div className="space-y-3">
-                    <Label htmlFor="experiencia">
-                      Comparte brevemente tu experiencia personal con el sistema educativo panameño
-                    </Label>
-                    <Textarea
-                      id="experiencia"
-                      placeholder="Describe tu experiencia como estudiante, docente, padre/madre o ciudadano..."
-                      className="min-h-[100px]"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Sugerencia general</h3>
-                  <div className="space-y-3">
-                    <Label htmlFor="sugerencia">
-                      ¿Qué sugerencia general harías para mejorar el sistema educativo?
-                    </Label>
-                    <Textarea id="sugerencia" placeholder="Comparte tu sugerencia..." className="min-h-[100px]" />
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button type="button" variant="outline" className="gap-1">
-                  <Save className="h-4 w-4" />
-                  Guardar borrador
-                </Button>
-                <Button type="submit" className="gap-1" disabled={isSubmitting}>
-                  {isSubmitting ? (
-                    <>Enviando...</>
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4" />
-                      Enviar opinión
-                    </>
-                  )}
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </TabsContent>
-
-        <TabsContent value="propuesta" className="mt-6">
-          <form onSubmit={handleSubmit}>
-            <Card>
-              <CardHeader>
-                <CardTitle>Propuesta detallada de solución</CardTitle>
-                <CardDescription>
-                  Comparte una propuesta concreta para abordar algún aspecto específico de la problemática educativa.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="titulo-propuesta">Título de la propuesta</Label>
-                    <Input
-                      id="titulo-propuesta"
-                      placeholder="Ej: Programa de formación docente en competencias digitales"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="area-propuesta">Área específica que aborda</Label>
-                    <Select>
-                      <SelectTrigger id="area-propuesta">
-                        <SelectValue placeholder="Selecciona una opción" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="formacion-docente">Formación docente</SelectItem>
-                        <SelectItem value="curriculo">Currículo y contenidos</SelectItem>
-                        <SelectItem value="tecnologia">Tecnología educativa</SelectItem>
-                        <SelectItem value="infraestructura">Infraestructura escolar</SelectItem>
-                        <SelectItem value="gestion">Gestión y administración</SelectItem>
-                        <SelectItem value="evaluacion">Evaluación y seguimiento</SelectItem>
-                        <SelectItem value="inclusion">Inclusión y equidad</SelectItem>
-                        <SelectItem value="financiamiento">Financiamiento</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="problema-especifico">Problema específico que busca resolver</Label>
-                    <Textarea
-                      id="problema-especifico"
-                      placeholder="Describe el problema concreto que tu propuesta busca abordar..."
-                      className="min-h-[100px]"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="descripcion-propuesta">Descripción detallada de la propuesta</Label>
-                    <Textarea
-                      id="descripcion-propuesta"
-                      placeholder="Explica en qué consiste tu propuesta, cómo funcionaría y qué recursos requeriría..."
-                      className="min-h-[150px]"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="beneficios">Beneficios esperados</Label>
-                    <Textarea
-                      id="beneficios"
-                      placeholder="¿Qué resultados positivos se obtendrían con la implementación de tu propuesta?"
-                      className="min-h-[100px]"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="actores">Actores involucrados en la implementación</Label>
-                    <Textarea
-                      id="actores"
-                      placeholder="¿Qué instituciones, organizaciones o grupos deberían participar en la implementación?"
-                      className="min-h-[100px]"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="tiempo-implementacion">Tiempo estimado de implementación</Label>
-                    <Select>
-                      <SelectTrigger id="tiempo-implementacion">
-                        <SelectValue placeholder="Selecciona una opción" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="corto">Corto plazo (menos de 1 año)</SelectItem>
-                        <SelectItem value="mediano">Mediano plazo (1-3 años)</SelectItem>
-                        <SelectItem value="largo">Largo plazo (más de 3 años)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="referencias">Referencias o ejemplos (opcional)</Label>
-                    <Textarea
-                      id="referencias"
-                      placeholder="¿Conoces ejemplos similares implementados en otros países o regiones? Comparte referencias si las tienes."
-                      className="min-h-[100px]"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button type="button" variant="outline" className="gap-1">
-                  <Save className="h-4 w-4" />
-                  Guardar borrador
-                </Button>
-                <Button type="submit" className="gap-1" disabled={isSubmitting}>
-                  {isSubmitting ? (
-                    <>Enviando...</>
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4" />
-                      Enviar propuesta
-                    </>
-                  )}
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </TabsContent>
-      </Tabs>
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Tu experiencia y propuestas</h3>
+              <div className="space-y-3">
+                <Label htmlFor="experiencia-propuestas">
+                  Comparte tu experiencia personal con la CSS y/o tus propuestas para mejorar el sistema
+                </Label>
+                <Textarea
+                  id="experiencia-propuestas"
+                  placeholder="Describe tu experiencia con la CSS, cómo te afecta la Ley 462, y qué propones para mejorar el sistema de seguridad social..."
+                  className="min-h-[150px]"
+                />
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button type="button" variant="outline" className="gap-1">
+              <Save className="h-4 w-4" />
+              Guardar borrador
+            </Button>
+            <Button type="submit" className="gap-1" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>Enviando...</>
+              ) : (
+                <>
+                  <Send className="h-4 w-4" />
+                  Enviar mi voz
+                </>
+              )}
+            </Button>
+          </CardFooter>
+        </Card>
+      </form>
     </div>
   )
 }

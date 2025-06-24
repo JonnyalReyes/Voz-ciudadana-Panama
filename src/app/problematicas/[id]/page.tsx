@@ -17,15 +17,14 @@ export default function ProblematicaDetailPage({ params }: { params: { id: strin
           <div className="flex flex-col md:flex-row gap-6 md:gap-12">
             <div className="flex-1 space-y-4">
               <div className="flex flex-wrap gap-2 mb-2">
-                <Badge>Educación</Badge>
-                <Badge variant="outline">Fase de recolección de opiniones</Badge>
+                <Badge>Seguridad Social</Badge>
+                <Badge variant="outline">Recolección de opiniones</Badge>
               </div>
               <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                Mejora del Sistema Educativo Panameño
+                Reforma de la Caja del Seguro Social - Ley 462
               </h1>
               <p className="text-gray-500 md:text-xl/relaxed max-w-[700px]">
-                Análisis de los desafíos actuales y propuestas para fortalecer la calidad educativa en todos los
-                niveles.
+                Análisis de la ley 462 para la reforma de la Caja del Seguro Social.
               </p>
               <div className="flex flex-wrap gap-4 items-center text-sm text-gray-500">
                 <div className="flex items-center gap-1">
