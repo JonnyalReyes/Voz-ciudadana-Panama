@@ -1,10 +1,22 @@
+// src/components/header.tsx
 "use client"
 
-import { useState } from "react"
+import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
+import { useSession, signOut } from "next-auth/react" // <-- IMPORTA ESTO
+import {
+  Bell,
+  LogOut,
+  Menu,
+  Search,
+  Settings,
+  Shield,
+  User,
+} from "lucide-react"
+
+import { ThemeToggle } from "../components/theme-toggle"
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"
+import { Button } from "../components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,18 +25,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu"
+import { Input } from "../components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "../components/ui/sheet"
-import { ThemeToggle } from "../components/theme-toggle"
-import { Search, Menu, Bell, User, LogOut, Settings, Shield } from "lucide-react"
-import { usePathname } from "next/navigation"
 
 export default function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false) // Simulación de estado de autenticación
-  const [isAdmin, setIsAdmin] = useState(true) // Simulación de rol de administrador
+  // REEMPLAZA el estado simulado con el hook de NextAuth
+  const { data: session, status } = useSession()
+  const isLoggedIn = status === "authenticated"
+  const isAdmin = session?.user?.role === "admin"
+  // ---
+
   const pathname = usePathname()
 
   const isActive = (path: string) => {
     return pathname === path
+  }
+
+  // Función auxiliar para obtener iniciales del nombre
+  const getInitials = (name: string = "") => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
   }
 
   return (
@@ -38,26 +61,36 @@ export default function Header() {
           <nav className="hidden md:flex gap-6">
             <Link
               href="/problematicas"
-              className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/problematicas") ? "text-primary" : "text-foreground/60"}`}
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive("/problematicas")
+                  ? "text-primary"
+                  : "text-foreground/60"
+              }`}
             >
               Problemáticas
             </Link>
             <Link
               href="/como-funciona"
-              className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/como-funciona") ? "text-primary" : "text-foreground/60"}`}
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive("/como-funciona") ? "text-primary" : "text-foreground/60"
+              }`}
             >
               Cómo Funciona
             </Link>
             <Link
               href="/resultados"
-              className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/resultados") ? "text-primary" : "text-foreground/60"}`}
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive("/resultados") ? "text-primary" : "text-foreground/60"
+              }`}
             >
               Resultados
             </Link>
             {isAdmin && (
               <Link
                 href="/admin"
-                className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/admin") ? "text-primary" : "text-foreground/60"} flex items-center gap-1`}
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  isActive("/admin") ? "text-primary" : "text-foreground/60"
+                } flex items-center gap-1`}
               >
                 <Shield className="h-4 w-4" />
                 Admin
@@ -86,8 +119,13 @@ export default function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt="@usuario" />
-                      <AvatarFallback>JP</AvatarFallback>
+                      <AvatarImage
+                        src={session.user?.image || undefined}
+                        alt={session.user?.name || ""}
+                      />
+                      <AvatarFallback>
+                        {getInitials(session.user?.name || "")}
+                      </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -95,33 +133,48 @@ export default function Header() {
                   <DropdownMenuLabel>Mi cuenta</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/perfil" className="cursor-pointer flex items-center gap-2">
+                    <Link
+                      href="/perfil"
+                      className="cursor-pointer flex items-center gap-2"
+                    >
                       <User className="h-4 w-4" />
                       <span>Perfil</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/perfil?tab=notificaciones" className="cursor-pointer flex items-center gap-2">
+                    <Link
+                      href="/perfil?tab=notificaciones"
+                      className="cursor-pointer flex items-center gap-2"
+                    >
                       <Bell className="h-4 w-4" />
                       <span>Notificaciones</span>
                     </Link>
                   </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem asChild>
-                      <Link href="/admin" className="cursor-pointer flex items-center gap-2">
+                      <Link
+                        href="/admin"
+                        className="cursor-pointer flex items-center gap-2"
+                      >
                         <Shield className="h-4 w-4" />
                         <span>Administración</span>
                       </Link>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem asChild>
-                    <Link href="/perfil?tab=configuracion" className="cursor-pointer flex items-center gap-2">
+                    <Link
+                      href="/perfil?tab=configuracion"
+                      className="cursor-pointer flex items-center gap-2"
+                    >
                       <Settings className="h-4 w-4" />
                       <span>Configuración</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer flex items-center gap-2 text-destructive">
+                  <DropdownMenuItem
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="cursor-pointer flex items-center gap-2 text-destructive"
+                  >
                     <LogOut className="h-4 w-4" />
                     <span>Cerrar sesión</span>
                   </DropdownMenuItem>
@@ -163,26 +216,40 @@ export default function Header() {
                 <nav className="grid gap-4">
                   <Link
                     href="/problematicas"
-                    className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/problematicas") ? "text-primary" : "text-foreground/60"}`}
+                    className={`text-sm font-medium transition-colors hover:text-primary ${
+                      isActive("/problematicas")
+                        ? "text-primary"
+                        : "text-foreground/60"
+                    }`}
                   >
                     Problemáticas
                   </Link>
                   <Link
                     href="/como-funciona"
-                    className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/como-funciona") ? "text-primary" : "text-foreground/60"}`}
+                    className={`text-sm font-medium transition-colors hover:text-primary ${
+                      isActive("/como-funciona")
+                        ? "text-primary"
+                        : "text-foreground/60"
+                    }`}
                   >
                     Cómo Funciona
                   </Link>
                   <Link
                     href="/resultados"
-                    className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/resultados") ? "text-primary" : "text-foreground/60"}`}
+                    className={`text-sm font-medium transition-colors hover:text-primary ${
+                      isActive("/resultados")
+                        ? "text-primary"
+                        : "text-foreground/60"
+                    }`}
                   >
                     Resultados
                   </Link>
                   {isAdmin && (
                     <Link
                       href="/admin"
-                      className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/admin") ? "text-primary" : "text-foreground/60"} flex items-center gap-2`}
+                      className={`text-sm font-medium transition-colors hover:text-primary ${
+                        isActive("/admin") ? "text-primary" : "text-foreground/60"
+                      } flex items-center gap-2`}
                     >
                       <Shield className="h-4 w-4" />
                       Administración
@@ -192,11 +259,18 @@ export default function Header() {
 
                 {isLoggedIn ? (
                   <div className="grid gap-2">
-                    <Link href="/perfil" className="flex items-center gap-2 text-sm font-medium">
+                    <Link
+                      href="/perfil"
+                      className="flex items-center gap-2 text-sm font-medium"
+                    >
                       <User className="h-4 w-4" />
                       <span>Mi perfil</span>
                     </Link>
-                    <Button variant="destructive" className="gap-2">
+                    <Button
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                      variant="destructive"
+                      className="gap-2"
+                    >
                       <LogOut className="h-4 w-4" />
                       <span>Cerrar sesión</span>
                     </Button>
@@ -207,7 +281,9 @@ export default function Header() {
                       <Link href="/registro">Solicitar verificación</Link>
                     </Button>
                     <Button variant="outline" asChild>
-                      <Link href="/registro?tab=iniciar-sesion">Iniciar sesión</Link>
+                      <Link href="/registro?tab=iniciar-sesion">
+                        Iniciar sesión
+                      </Link>
                     </Button>
                   </div>
                 )}
@@ -217,5 +293,5 @@ export default function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }
