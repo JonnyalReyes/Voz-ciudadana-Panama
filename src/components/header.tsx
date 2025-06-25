@@ -1,6 +1,10 @@
 // src/components/header.tsx
 "use client"
 
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "./ui/command";
+import { FileText } from "lucide-react";
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react" // <-- IMPORTA ESTO
@@ -48,6 +52,46 @@ export default function Header() {
       .map((n) => n[0])
       .join("")
       .toUpperCase()
+  }
+
+  const router = useRouter();
+
+  // --- Estados y lógica para la búsqueda ---
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  useEffect(() => {
+    if (!searchQuery || !isSearchOpen) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/search?q=${searchQuery}`);
+        if (response.ok) {
+          setSearchResults(await response.json());
+        }
+      } catch (error) {
+        console.error("Error al buscar:", error);
+      }
+    }, 300); // Debounce de 300ms
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, isSearchOpen]);
+  
+  const handleSelectResult = useCallback((id: number) => {
+    router.push(`/problematicas/${id}`);
+    setIsSearchOpen(false);
+    setSearchQuery("");
+  }, [router]);
+
+  // Definimos el tipo aquí mismo para que sea claro
+  interface SearchResult {
+    id: number;
+    title: string;
+    category: string;
   }
 
   return (
@@ -100,10 +144,38 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="hidden md:flex relative w-40 lg:w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input type="search" placeholder="Buscar..." className="pl-8" />
-          </div>
+          {/* La lógica de visibilidad ahora es manejada internamente por el componente Command */}
+          <Command className="hidden md:flex relative rounded-lg border w-40 lg:w-64 overflow-visible">
+            <CommandInput 
+              placeholder="Buscar problemática..."
+              value={searchQuery}
+              onValueChange={setSearchQuery}
+              onFocus={() => setIsSearchOpen(true)}
+              onBlur={() => setTimeout(() => setIsSearchOpen(false), 200)}
+            />
+            {/* Renderizamos la lista solo si está abierta, pero el contenido lo decide Command */}
+            {isSearchOpen && (
+              <CommandList className="absolute top-full mt-2 w-full rounded-md border bg-background shadow-lg z-10">
+                <CommandEmpty>
+                    {searchQuery.length > 1 && searchResults.length === 0 ? "No se encontraron resultados." : ""}
+                </CommandEmpty>
+                {searchResults.length > 0 && (
+                    <CommandGroup heading="Resultados">
+                        {searchResults.map((result) => (
+                            <CommandItem
+                                key={result.id}
+                                onSelect={() => handleSelectResult(result.id)}
+                                className="flex items-center gap-2 cursor-pointer"
+                            >
+                                <FileText className="h-4 w-4 text-muted-foreground" />
+                                <span>{result.title}</span>
+                            </CommandItem>
+                        ))}
+                    </CommandGroup>
+                )}
+              </CommandList>
+            )}
+          </Command>
 
           <ThemeToggle />
 

@@ -1,10 +1,13 @@
-import { Button } from "../../components/ui/button"
-import Link from "next/link"
-import Image from "next/image"
-import { ChevronRight } from "lucide-react"
-import PageHeader from "../../components/page-header"
+import { Button } from "../../components/ui/button";
+import Link from "next/link";
+import Image from "next/image";
+import { ChevronRight } from "lucide-react";
+import PageHeader from "../../components/page-header";
+import { auth } from "../../auth"; 
 
-export default function ComoFuncionaPage() {
+export default async function ComoFuncionaPage() { // <-- 2. CONVERTIMOS LA FUNCIÓN EN ASYNC
+  const session = await auth(); // Obtenemos la sesión en el servidor
+
   return (
     <div className="flex flex-col min-h-screen">
       <PageHeader
@@ -205,21 +208,24 @@ export default function ComoFuncionaPage() {
             </div>
           </div>
 
-          <div className="mt-12 text-center">
-            <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl mb-4">¿Listo para participar?</h2>
-            <p className="text-gray-500 md:text-lg/relaxed max-w-[700px] mx-auto mb-6">
-              Únete a Voz Ciudadana Panamá y comienza a contribuir en la búsqueda de soluciones para los desafíos que
-              enfrenta nuestro país.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button asChild size="lg">
-                <Link href="/registro">Crear una cuenta</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href="/problematicas">Explorar problemáticas</Link>
-              </Button>
+          {/* 3. AÑADIMOS LA CONDICIÓN PARA MOSTRAR LA SECCIÓN SOLO SI NO HAY SESIÓN */}
+          {!session && (
+            <div className="mt-12 text-center">
+              <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl mb-4">¿Listo para participar?</h2>
+              <p className="text-gray-500 md:text-lg/relaxed max-w-[700px] mx-auto mb-6">
+                Únete a Voz Ciudadana Panamá y comienza a contribuir en la búsqueda de soluciones para los desafíos que
+                enfrenta nuestro país.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button asChild size="lg">
+                  <Link href="/registro">Crear una cuenta</Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link href="/problematicas">Explorar problemáticas</Link>
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
     </div>

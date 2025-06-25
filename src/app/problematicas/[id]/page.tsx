@@ -1,59 +1,29 @@
 import { auth } from "../../../auth";
+import { getProblematicaById, getQuestionsByProblematicaId, getSurveyParticipantCount } from "@/src/lib/data";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
 import { Badge } from "../../../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
-import { Progress } from "../../../components/ui/progress";
 import { FileText, MessageSquare, BarChart3, Users, Clock, Calendar, Share2 } from "lucide-react";
 import ProblematicaContent from "../../../components/problematica-content";
 import OpinionForm from "../../../components/opinion-form";
 import DiscussionForum from "../../../components/discussion-forum";
 import ResultsVisualization from "../../../components/results-visualization";
 import Link from "next/link";
+import { Progress } from "../../../components/ui/progress";
 
-// --- Tipos de Datos ---
-interface Problematica {
-  id: number;
-  title: string;
-  description: string;
-  content: string;
-  category: string;
-  status: string;
-  allow_forum: boolean;
-  show_results: boolean;
-  created_at: string;
-  end_date?: string | null;
-}
 
-import type { SurveyQuestion } from "@/src/lib/data";
-
-// --- Funciones para obtener los datos en el servidor ---
-async function getProblematica(id: string): Promise<Problematica | null> {
-  try {
-    const res = await fetch(`http://localhost:3000/api/problematicas/${id}`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    return res.json();
-  } catch (error) {
-    console.error("Failed to fetch problematica:", error);
-    return null;
-  }
-}
-
-async function getQuestions(id: string): Promise<SurveyQuestion[]> {
-  try {
-    const res = await fetch(`http://localhost:3000/api/problematicas/${id}/questions`, { cache: 'no-store' });
-    if (!res.ok) return [];
-    return res.json();
-  } catch (error) {
-    console.error("Failed to fetch questions:", error);
-    return [];
-  }
-}
-
-// --- El Componente de Página (Server Component) ---
 export default async function ProblematicaDetailPage({ params }: { params: { id: string } }) {
-  const problematica = await getProblematica(params.id);
+  
+  // Obtenemos todos los datos necesarios en paralelo para mayor eficiencia
+  const [problematica, questions, participantCount, session] = await Promise.all([
+    getProblematicaById(params.id),
+    getQuestionsByProblematicaId(params.id),
+    getSurveyParticipantCount(params.id),
+    auth()
+  ]);
 
+  // Si la problemática no se encuentra, nos detenemos y mostramos un mensaje.
   if (!problematica) {
     return (
       <div className="container py-24 text-center">
@@ -65,9 +35,6 @@ export default async function ProblematicaDetailPage({ params }: { params: { id:
       </div>
     );
   }
-
-  const questions = await getQuestions(params.id);
-  const session = await auth();
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -82,44 +49,36 @@ export default async function ProblematicaDetailPage({ params }: { params: { id:
               <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                 {problematica.title}
               </h1>
-              <p className="text-gray-500 md:text-xl/relaxed max-w-[700px]">
-                {problematica.description}
-              </p>
-              <div className="flex flex-wrap gap-4 items-center text-sm text-gray-500">
+              <div className="flex flex-wrap gap-4 items-center text-sm text-gray-500 pt-2">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   <span>Publicado: {new Date(problematica.created_at).toLocaleDateString('es-PA')}</span>
                 </div>
-                {problematica.end_date && (
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    <span>Cierre de opiniones: {new Date(problematica.end_date).toLocaleDateString('es-PA')}</span>
-                  </div>
-                )}
               </div>
             </div>
-            <div className="flex flex-col gap-4 md:w-64">
+            
+            <div className="flex flex-col gap-4 md:w-72">
               <Card>
-                <CardContent className="p-4">
-                  <div className="space-y-3">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">Progreso de participación</p>
-                      <Progress value={65} className="h-2" />
+                <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                        <Users className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                            <p className="text-sm font-medium">{participantCount} Ciudadanos</p>
+                            <p className="text-xs text-muted-foreground">Han participado en la encuesta</p>
+                        </div>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <div><p className="font-medium">1,245</p><p className="text-gray-500">Opiniones</p></div>
-                      <div><p className="font-medium">324</p><p className="text-gray-500">Propuestas</p></div>
-                      <div><p className="font-medium">89</p><p className="text-gray-500">Días</p></div>
+                    <div className="flex items-center gap-3">
+                        <Clock className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                            <p className="text-sm font-medium">Fecha de Cierre</p>
+                            <p className="text-xs text-muted-foreground">
+                                {problematica.end_date ? new Date(problematica.end_date).toLocaleDateString('es-PA') : 'No definida'}
+                            </p>
+                        </div>
                     </div>
-                  </div>
                 </CardContent>
               </Card>
-              <div className="flex flex-col gap-2">
-                <Button>Participar ahora</Button>
-                <Button variant="outline" className="gap-1">
-                  <Share2 className="h-4 w-4" /> Compartir
-                </Button>
-              </div>
+              <Button>Participar ahora</Button>
             </div>
           </div>
         </div>
@@ -129,18 +88,10 @@ export default async function ProblematicaDetailPage({ params }: { params: { id:
         <div className="container px-4 md:px-6">
           <Tabs defaultValue="informacion" className="w-full">
             <TabsList className="grid w-full grid-cols-4 max-w-3xl mx-auto">
-              <TabsTrigger value="informacion" className="flex items-center gap-1">
-                <FileText className="h-4 w-4" /><span className="hidden sm:inline">Información</span>
-              </TabsTrigger>
-              <TabsTrigger value="opinar" className="flex items-center gap-1">
-                <MessageSquare className="h-4 w-4" /><span className="hidden sm:inline">Opinar</span>
-              </TabsTrigger>
-              <TabsTrigger value="discusion" className="flex items-center gap-1" disabled={!problematica.allow_forum}>
-                <Users className="h-4 w-4" /><span className="hidden sm:inline">Discusión</span>
-              </TabsTrigger>
-              <TabsTrigger value="resultados" className="flex items-center gap-1" disabled={!problematica.show_results}>
-                <BarChart3 className="h-4 w-4" /><span className="hidden sm:inline">Resultados</span>
-              </TabsTrigger>
+              <TabsTrigger value="informacion" className="flex items-center gap-1"><FileText className="h-4 w-4" /> <span className="hidden sm:inline">Información</span></TabsTrigger>
+              <TabsTrigger value="opinar" className="flex items-center gap-1"><MessageSquare className="h-4 w-4" /> <span className="hidden sm:inline">Opinar</span></TabsTrigger>
+              <TabsTrigger value="discusion" className="flex items-center gap-1" disabled={!problematica.allow_forum}><Users className="h-4 w-4" /> <span className="hidden sm:inline">Discusión</span></TabsTrigger>
+              <TabsTrigger value="resultados" className="flex items-center gap-1" disabled={!problematica.show_results}><BarChart3 className="h-4 w-4" /> <span className="hidden sm:inline">Resultados</span></TabsTrigger>
             </TabsList>
 
             <TabsContent value="informacion" className="py-6">

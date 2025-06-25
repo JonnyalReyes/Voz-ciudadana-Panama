@@ -48,6 +48,7 @@ export default function AdminProblematicasManager() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [viewingProblematica, setViewingProblematica] = useState<Problematica | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  
   const [problematicas, setProblematicas] = useState<Problematica[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState(initialFormState);
@@ -66,8 +67,9 @@ export default function AdminProblematicasManager() {
     fetchProblematicas();
   }, []);
 
-const handleOpenDialog = async (problematica: Problematica | null = null) => {
-    if (problematica) { // Editando
+  const handleOpenDialog = async (problematica: Problematica | null = null) => {
+    setSurveyQuestions([]); // Siempre reseteamos las preguntas al abrir
+    if (problematica) { // Modo Edición
         setEditingId(problematica.id);
         setFormData({
             title: problematica.title,
@@ -78,38 +80,31 @@ const handleOpenDialog = async (problematica: Problematica | null = null) => {
             allowForum: Boolean(problematica.allow_forum),
             showResults: Boolean(problematica.show_results),
         });
-        
-        // --- AÑADIMOS LA LÓGICA PARA CARGAR PREGUNTAS ---
+        // Cargamos las preguntas existentes para esta problemática
         try {
             const response = await fetch(`/api/problematicas/${problematica.id}/questions`);
-            if (!response.ok) throw new Error('No se pudieron cargar las preguntas de la encuesta');
-            const existingQuestions = await response.json();
-            setSurveyQuestions(existingQuestions);
-        } catch (error) {
-            console.error(error);
-            setSurveyQuestions([]);
-        }
-
-    } else { // Creando
+            if (response.ok) setSurveyQuestions(await response.json());
+        } catch (error) { console.error("Error al cargar preguntas:", error); }
+    } else { // Modo Creación
         setEditingId(null);
         setFormData(initialFormState);
-        setSurveyQuestions([]); // Al crear, siempre empezamos con 0 preguntas
+        setIsCreating(true); // <-- ESTA LÍNEA ES CLAVE PARA ABRIR EL DIÁLOGO
     }
   };
-
+  
   const handleSaveProblematica = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!formData.category) {
-        alert("Por favor, selecciona una categoría.");
-        return;
-    }
+    if (!formData.category) { alert("Por favor, selecciona una categoría."); return; }
+    
     const url = editingId ? `/api/problematicas/${editingId}` : '/api/problematicas';
     const method = editingId ? 'PUT' : 'POST';
     const body = { ...formData, questions: surveyQuestions };
 
     try {
         const response = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-        if (!response.ok) throw new Error(editingId ? 'Error al actualizar la problemática' : 'Error al crear la problemática');
+        if (!response.ok) throw new Error(editingId ? 'Error al actualizar' : 'Error al crear');
+        
+        // Cerramos el diálogo y recargamos la lista
         setEditingId(null);
         setIsCreating(false);
         fetchProblematicas();
@@ -120,13 +115,13 @@ const handleOpenDialog = async (problematica: Problematica | null = null) => {
     if (!deletingId) return;
     try {
         const response = await fetch(`/api/problematicas/${deletingId}`, { method: 'DELETE' });
-        if (!response.ok) throw new Error('Error al eliminar la problemática');
+        if (!response.ok) throw new Error('Error al eliminar');
         setDeletingId(null);
         fetchProblematicas();
     } catch (error) { alert((error as Error).message); }
   };
 
-  if (isLoading) return <div className="p-4">Cargando...</div>;
+  if (isLoading) return <div className="p-4 text-center">Cargando...</div>;
 
   return (
     <div className="space-y-6">
@@ -145,29 +140,23 @@ const handleOpenDialog = async (problematica: Problematica | null = null) => {
             problematicas.map((problematica) => (
             <Card key={problematica.id}>
                 <CardHeader>
-                <div className="flex justify-between items-start gap-4">
+                  <div className="flex justify-between items-start gap-4">
                     <div className="space-y-2 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                        <CardTitle className="text-lg">{problematica.title}</CardTitle>
-                        <Badge variant={problematica.status === "Activa" ? "default" : "secondary"}>{problematica.status}</Badge>
-                    </div>
-                    <CardDescription>{problematica.description}</CardDescription>
-                    <div className="flex gap-4 text-sm text-gray-500 pt-1">
-                        <span>Categoría: {problematica.category}</span>
-                        <span>Creada: {new Date(problematica.created_at).toLocaleDateString()}</span>
-                    </div>
+                      <div className="flex items-center gap-2 flex-wrap"><CardTitle className="text-lg">{problematica.title}</CardTitle><Badge variant={problematica.status === "Activa" ? "default" : "secondary"}>{problematica.status}</Badge></div>
+                      <CardDescription>{problematica.description}</CardDescription>
+                      <div className="flex gap-4 text-sm text-gray-500 pt-1"><span>Categoría: {problematica.category}</span><span>Creada: {new Date(problematica.created_at).toLocaleDateString()}</span></div>
                     </div>
                     <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => setViewingProblematica(problematica)}><Eye className="h-4 w-4" /></Button>
                         <Button variant="outline" size="sm" onClick={() => handleOpenDialog(problematica)}><Edit className="h-4 w-4" /></Button>
                         <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700" onClick={() => setDeletingId(problematica.id)}><Trash2 className="h-4 w-4" /></Button>
                     </div>
-                </div>
+                  </div>
                 </CardHeader>
             </Card>
             ))
         ) : (
-            <p className="text-muted-foreground text-center py-8">No hay problemáticas creadas todavía.</p>
+            <p className="text-muted-foreground text-center py-8">No hay problemáticas creadas todavía. Haz clic en "Nueva Problemática" para empezar.</p>
         )}
       </div>
 
@@ -176,35 +165,20 @@ const handleOpenDialog = async (problematica: Problematica | null = null) => {
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{viewingProblematica?.title}</DialogTitle>
-            <DialogDescription>{viewingProblematica?.category} - Creada el {viewingProblematica ? new Date(viewingProblematica.created_at).toLocaleDateString() : ''}</DialogDescription>
+            <DialogDescription>{viewingProblematica?.category}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            {viewingProblematica?.image_url && (
-                <div className="relative h-60 w-full bg-muted rounded-md">
-                    <Image src={viewingProblematica.image_url} alt={viewingProblematica.title} layout="fill" objectFit="cover" className="rounded-md" />
-                </div>
-            )}
-            <div>
-                <h3 className="font-semibold mb-1">Descripción</h3>
-                <p className="text-sm text-muted-foreground">{viewingProblematica?.description}</p>
-            </div>
-            <div>
-                <h3 className="font-semibold mb-1">Contenido Completo</h3>
-                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{viewingProblematica?.content}</p>
-            </div>
+            {viewingProblematica?.image_url && <div className="relative h-60 w-full bg-muted rounded-md"><Image src={viewingProblematica.image_url} alt={viewingProblematica.title} layout="fill" objectFit="cover" className="rounded-md border" /></div>}
+            <div><h3 className="font-semibold mb-1">Descripción</h3><p className="text-sm text-muted-foreground">{viewingProblematica?.description}</p></div>
+            <div><h3 className="font-semibold mb-1">Contenido Completo</h3><p className="text-sm text-muted-foreground whitespace-pre-wrap">{viewingProblematica?.content}</p></div>
           </div>
-           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setViewingProblematica(null)}>Cerrar</Button>
-          </DialogFooter>
+           <DialogFooter><Button type="button" variant="outline" onClick={() => setViewingProblematica(null)}>Cerrar</Button></DialogFooter>
         </DialogContent>
       </Dialog>
       
       {/* DIÁLOGO PARA CREAR/EDITAR */}
       <Dialog open={isCreating || editingId !== null} onOpenChange={(open) => {
-          if (!open) {
-              setIsCreating(false);
-              setEditingId(null);
-          }
+          if (!open) { setIsCreating(false); setEditingId(null); }
       }}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -222,7 +196,7 @@ const handleOpenDialog = async (problematica: Problematica | null = null) => {
                       <div className="space-y-2"><Label htmlFor="title">Título *</Label><Input id="title" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} required /></div>
                       <div className="space-y-2"><Label htmlFor="category">Categoría *</Label><Select required value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}><SelectTrigger id="category"><SelectValue placeholder="Selecciona..." /></SelectTrigger><SelectContent><SelectItem value="Educación">Educación</SelectItem><SelectItem value="Salud">Salud</SelectItem><SelectItem value="Seguridad Social">Seguridad Social</SelectItem><SelectItem value="Medio Ambiente">Medio Ambiente</SelectItem><SelectItem value="Economía">Economía</SelectItem><SelectItem value="Infraestructura">Infraestructura</SelectItem><SelectItem value="Seguridad">Seguridad</SelectItem><SelectItem value="Transparencia">Transparencia</SelectItem></SelectContent></Select></div>
                     </div>
-                    <div className="space-y-2"><Label htmlFor="description">Descripción Corta *</Label><Textarea id="description" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} required className="min-h-[100px]"/></div>
+                    <div className="space-y-2"><Label htmlFor="description">Descripción Corta *</Label><Textarea id="description" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} required className="min-h-[100px]" /></div>
                     <div className="space-y-2"><Label htmlFor="content">Contenido Completo</Label><Textarea id="content" value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="min-h-[150px]" /></div>
                     <div className="space-y-2"><Label htmlFor="imageUrl">URL de Imagen</Label><Input id="imageUrl" value={formData.imageUrl} onChange={(e) => setFormData({...formData, imageUrl: e.target.value})} /></div>
                     <div className="grid grid-cols-2 gap-6">
@@ -245,7 +219,7 @@ const handleOpenDialog = async (problematica: Problematica | null = null) => {
       {/* DIÁLOGO DE CONFIRMACIÓN PARA ELIMINAR */}
       <AlertDialog open={deletingId !== null} onOpenChange={() => setDeletingId(null)}>
         <AlertDialogContent>
-            <AlertDialogHeader><AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle><AlertDialogDescription>Esta acción no se puede deshacer. Esto eliminará permanentemente la problemática y sus datos asociados.</AlertDialogDescription></AlertDialogHeader>
+            <AlertDialogHeader><AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle><AlertDialogDescription>Esta acción no se puede deshacer. Esto eliminará permanentemente la problemática y sus datos asociados (preguntas, respuestas, etc.).</AlertDialogDescription></AlertDialogHeader>
             <AlertDialogFooter>
                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
                 <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive hover:bg-destructive/90">Eliminar</AlertDialogAction>
