@@ -16,6 +16,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Plus, Edit, Trash2, Eye } from "lucide-react";
 import DynamicSurveyBuilder, { type SurveyQuestion } from "./dynamic-survey-builder";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Download } from "lucide-react"; 
 
 // Tipo para la 'problemática' que coincide con la BD
 interface Problematica {
@@ -42,6 +43,34 @@ const initialFormState = {
     allowForum: true,
     showResults: true,
 };
+
+  const handleDownload = async (problematicaId: number, type: 'survey' | 'forum') => {
+    try {
+        const response = await fetch(`/api/problematicas/${problematicaId}/download/${type}`);
+        if (!response.ok) {
+            throw new Error(`Error al descargar el archivo de ${type}`);
+        }
+        
+        // Obtener el nombre del archivo desde las cabeceras de la respuesta
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const fileNameMatch = contentDisposition && contentDisposition.match(/filename="(.+?)"/);
+        const fileName = fileNameMatch ? fileNameMatch[1] : `descarga_${type}.xlsx`;
+        
+        // Crear un Blob y un enlace para iniciar la descarga
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error(error);
+        alert((error as Error).message);
+    }
+  };
 
 export default function AdminProblematicasManager() {
   const [isCreating, setIsCreating] = useState(false);
@@ -147,9 +176,11 @@ export default function AdminProblematicasManager() {
                       <div className="flex gap-4 text-sm text-gray-500 pt-1"><span>Categoría: {problematica.category}</span><span>Creada: {new Date(problematica.created_at).toLocaleDateString()}</span></div>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => setViewingProblematica(problematica)}><Eye className="h-4 w-4" /></Button>
-                        <Button variant="outline" size="sm" onClick={() => handleOpenDialog(problematica)}><Edit className="h-4 w-4" /></Button>
-                        <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700" onClick={() => setDeletingId(problematica.id)}><Trash2 className="h-4 w-4" /></Button>
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(problematica.id, 'survey')}><Download className="h-4 w-4 mr-1" /> Encuesta</Button>
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(problematica.id, 'forum')}><Download className="h-4 w-4 mr-1" /> Foro</Button>
+                        <Button variant="outline" size="icon" onClick={() => setViewingProblematica(problematica)}><Eye className="h-4 w-4" /></Button>
+                        <Button variant="outline" size="icon" onClick={() => handleOpenDialog(problematica)}><Edit className="h-4 w-4" /></Button>
+                        <Button variant="outline" size="icon" className="text-red-600 hover:text-red-700" onClick={() => setDeletingId(problematica.id)}><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </div>
                 </CardHeader>

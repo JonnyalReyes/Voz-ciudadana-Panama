@@ -10,19 +10,9 @@ export async function POST(request: Request) {
     console.log('Datos recibidos en la API:', data); // ¡Útil para depurar!
 
     const {
-      nombre,
-      apellido,
-      cedula,
-      email,
-      password,
-      telefono,
-      provincia,
-      direccion,
-      ocupacion,
-      nivel_educativo,
-      motivacion,
-      // documento_url no lo manejamos aquí aún, eso sería para subida de archivos
-    } = data;
+          nombre, apellido, cedula, fecha_nacimiento, sexo, email, password, telefono, provincia,
+          direccion, ocupacion, nivel_educativo, motivacion,
+        } = data;
 
     // 2. Validar que los datos necesarios están presentes
     if (!nombre || !apellido || !cedula || !email || !password) {
@@ -39,22 +29,14 @@ export async function POST(request: Request) {
     // 4. Preparar la consulta SQL para insertar el nuevo usuario
     const sql = `
       INSERT INTO users (
-        nombre, apellido, cedula, email, password, telefono, provincia,
-        ocupacion, nivel_educativo, motivacion, status, role
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'user')
+        nombre, apellido, cedula, fecha_nacimiento, sexo, email, password, telefono, provincia,
+        direccion, ocupacion, nivel_educativo, motivacion, status, role
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'user')
     `;
 
     const values = [
-      nombre,
-      apellido,
-      cedula,
-      email,
-      hashedPassword,
-      telefono,
-      provincia,
-      ocupacion,
-      nivel_educativo,
-      motivacion,
+      nombre, apellido, cedula, fecha_nacimiento, sexo, email, hashedPassword, telefono, provincia,
+      direccion, ocupacion, nivel_educativo, motivacion,
     ];
 
     // 5. Ejecutar la consulta

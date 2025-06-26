@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Alert, AlertDescription } from "../../components/ui/alert"
 import { Eye, EyeOff, Upload, AlertCircle, Shield } from "lucide-react"
 import PageHeader from "../../components/page-header"
+import { RadioGroup, RadioGroupItem } from "@/src/components/ui/radio-group";
 
 // --- Importamos los componentes para las pestañas y el formulario de login ---
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
@@ -36,6 +37,8 @@ export default function RegistroPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [provincia, setProvincia] = useState<string>("");
   const [nivelEducativo, setNivelEducativo] = useState<string>("");
+  const [fechaNacimiento, setFechaNacimiento] = useState<string>("");
+  const [sexo, setSexo] = useState<string>("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -62,7 +65,9 @@ export default function RegistroPage() {
       ocupacion: (form.elements.namedItem('ocupacion') as HTMLInputElement).value,
       motivacion: (form.elements.namedItem('motivacion') as HTMLTextAreaElement).value,
       provincia: provincia,
+      fecha_nacimiento: fechaNacimiento,
       nivel_educativo: nivelEducativo,
+      sexo: sexo,
     };
 
     if (!formData.provincia || !formData.nivel_educativo) {
@@ -185,6 +190,39 @@ export default function RegistroPage() {
                     </div>
 
                     <div className="space-y-2">
+                      <Label htmlFor="fecha-nacimiento">Fecha de nacimiento *</Label>
+                      <Input 
+                        id="fecha-nacimiento" 
+                        name="fecha-nacimiento" 
+                        type="date" 
+                        required 
+                        value={fechaNacimiento}
+                        onChange={(e) => setFechaNacimiento(e.target.value)}
+                        // Lógica para no permitir fechas de menores de 18 años
+                        max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split("T")[0]}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Sexo *</Label>
+                      <RadioGroup 
+                          required 
+                          className="flex space-x-6"
+                          value={sexo}
+                          onValueChange={setSexo}
+                      >
+                          <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="hombre" id="r-hombre" />
+                              <Label htmlFor="r-hombre">Hombre</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="mujer" id="r-mujer" />
+                              <Label htmlFor="r-mujer">Mujer</Label>
+                          </div>
+                      </RadioGroup>
+                    </div>
+
+                    <div className="space-y-2">
                       <Label htmlFor="email">Correo electrónico *</Label>
                       <Input id="email" name="email" type="email" placeholder="tu@ejemplo.com" required />
                     </div>
@@ -232,9 +270,7 @@ export default function RegistroPage() {
                                 <SelectItem value="veraguas">Veraguas</SelectItem>
                                 <SelectItem value="darien">Darién</SelectItem>
                                 <SelectItem value="panama-oeste">Panamá Oeste</SelectItem>
-                                <SelectItem value="guna-yala">Guna Yala</SelectItem>
-                                <SelectItem value="embera-wounaan">Emberá-Wounaan</SelectItem>
-                                <SelectItem value="ngoble-bugle">Ngöble-Buglé</SelectItem>
+                                <SelectItem value="bocas-del-toro">Bocas del Toro</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
